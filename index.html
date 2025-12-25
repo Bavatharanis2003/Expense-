@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -10,6 +11,17 @@
 <div class="container">
     <h2>Expense Tracker</h2>
 
+    <!-- Income Section -->
+    <input type="number" id="income" placeholder="Enter Income">
+    <button onclick="addIncome()">Add Income</button>
+
+    <h3>Income: ₹ <span id="incomeTotal">0</span></h3>
+    <h3>Expense: ₹ <span id="expenseTotal">0</span></h3>
+    <h3>Balance: ₹ <span id="balance">0</span></h3>
+
+    <hr>
+
+    <!-- Expense Section -->
     <input type="date" id="date">
     <input type="text" id="title" placeholder="Expense Title">
 
@@ -19,18 +31,40 @@
         <option value="Other">Other</option>
     </select>
 
-    <input type="number" id="amount" placeholder="Amount">
-
+    <input type="number" id="amount" placeholder="Expense Amount">
     <button onclick="addExpense()">Add Expense</button>
 
-    <h3>Total: ₹ <span id="total">0</span></h3>
-
+    <!-- Summary -->
     <h4>Category Summary</h4>
     <p>Food: ₹ <span id="food">0</span></p>
     <p>Travel: ₹ <span id="travel">0</span></p>
     <p>Other: ₹ <span id="other">0</span></p>
 
+    <!-- Filter -->
+    <h4>Filter Expenses</h4>
+    <input type="date" id="filterDate">
+    <select id="filterCategory">
+        <option value="All">All</option>
+        <option value="Food">Food</option>
+        <option value="Travel">Travel</option>
+        <option value="Other">Other</option>
+    </select>
+    <button onclick="filterExpenses()">Apply Filter</button>
+
+    <!-- Monthly Report -->
+    <h4>Monthly Report</h4>
+    <input type="month" id="month">
+    <button onclick="monthlyReport()">View Report</button>
+    <p id="monthlyTotal"></p>
+
+    <!-- Expense List -->
     <ul id="list"></ul>
+
+    <!-- Chart -->
+    <h4>Expense Chart</h4>
+    <canvas id="chart" width="300" height="200"></canvas>
+
+    <button class="clear" onclick="clearAll()">Clear All Data</button>
 </div>
 
 <script src="script.js"></script>
