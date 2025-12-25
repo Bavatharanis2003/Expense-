@@ -2,16 +2,15 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Expense Tracker</title>
+    <title>Ultimate Expense Tracker v9</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
 <div class="container">
-    <h2>Expense Tracker</h2>
+    <h2>Ultimate Expense Tracker v9</h2>
 
     <!-- Dark Mode -->
-    <button onclick="toggleMode()">🌙 Toggle Mode</button>
+    <button onclick="toggleMode()">🌙 Toggle Dark Mode</button>
 
     <!-- Income & Budget -->
     <input type="number" id="income" placeholder="Enter Income">
@@ -24,6 +23,7 @@
     <h3>Income: ₹ <span id="incomeTotal">0</span></h3>
     <h3>Expense: ₹ <span id="expenseTotal">0</span></h3>
     <h3>Balance: ₹ <span id="balance">0</span></h3>
+    <h3>Expense Count: <span id="expenseCount">0</span></h3>
 
     <hr>
 
@@ -38,17 +38,42 @@
     <input type="number" id="amount" placeholder="Amount">
     <button onclick="addExpense()">Add Expense</button>
 
-    <!-- Search -->
-    <h4>Search Expense</h4>
-    <input type="text" id="search" placeholder="Search by title" onkeyup="searchExpense()">
+    <!-- Filters -->
+    <h4>Filter Expenses</h4>
+    <input type="date" id="filterDate">
+    <select id="filterCategory">
+        <option value="All">All</option>
+        <option>Food</option>
+        <option>Travel</option>
+        <option>Other</option>
+    </select>
+    <button onclick="applyFilter()">Apply Filter</button>
+    <button onclick="resetFilter()">Reset Filter</button>
 
-    <!-- Today Summary -->
+    <!-- Search -->
+    <h4>Search by Title</h4>
+    <input type="text" id="search" placeholder="Search Expense" onkeyup="searchExpense()">
+
+    <!-- Monthly Report -->
+    <h4>Monthly Report</h4>
+    <input type="month" id="month">
+    <button onclick="monthlyReport()">View Report</button>
+    <p id="monthlyTotal"></p>
+
+    <!-- Today’s Expense -->
     <h4>Today’s Expense: ₹ <span id="todayTotal">0</span></h4>
 
     <!-- Expense List -->
     <ul id="list"></ul>
 
-    <button class="clear" onclick="clearAll()">Clear All</button>
+    <!-- Expense Chart -->
+    <h4>Category Expense Chart</h4>
+    <canvas id="chart" width="300" height="200"></canvas>
+
+    <!-- Download -->
+    <button onclick="downloadCSV()">Download CSV</button>
+
+    <button class="clear" onclick="clearAll()">Clear All Data</button>
 </div>
 
 <script src="script.js"></script>
