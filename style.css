@@ -7,7 +7,7 @@
 
 body {
     font-family: Arial, sans-serif;
-    background: #eef2f3;
+    background: linear-gradient(to right, #74ebd5, #9face6);
 }
 
 .dark {
@@ -16,8 +16,8 @@ body {
 }
 
 .container {
-    width: 380px;
-    margin: 30px auto;
+    width: 400px;
+    margin: 25px auto;
     background: white;
     padding: 20px;
     border-radius: 15px;
@@ -38,6 +38,7 @@ button {
     color: white;
     border: none;
     cursor: pointer;
+    border-radius: 6px;
 }
 
 button:hover {
@@ -46,6 +47,7 @@ button:hover {
 
 ul {
     list-style: none;
+    margin-top: 8px;
 }
 
 li {
@@ -54,20 +56,31 @@ li {
     margin: 5px 0;
     display: flex;
     justify-content: space-between;
+    align-items: center;
+    font-size: 13px;
+    border-radius: 6px;
 }
 
 .dark li {
     background: #555;
 }
 
+.edit {
+    background: green;
+    margin-right: 4px;
+}
+
 .delete {
     background: red;
 }
 
-.edit {
-    background: green;
-}
-
 .clear {
     background: orange;
+    margin-top: 10px;
+}
+
+canvas {
+    margin-top: 10px;
+    background: #fafafa;
+    border-radius: 8px;
 }
