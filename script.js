@@ -1,143 +1,120 @@
+
 let incomeTotal = 0;
 let expenseTotal = 0;
-let summary = { Food: 0, Travel: 0, Other: 0 };
+let budget = 0;
+let expenses = [];
 
 window.onload = function () {
-    let income = localStorage.getItem("income") || 0;
-    let expenses = JSON.parse(localStorage.getItem("expenses")) || [];
+    expenses = JSON.parse(localStorage.getItem("expenses")) || [];
+    incomeTotal = Number(localStorage.getItem("income")) || 0;
+    budget = Number(localStorage.getItem("budget")) || 0;
 
-    incomeTotal = Number(income);
     document.getElementById("incomeTotal").innerText = incomeTotal;
-
-    expenses.forEach(exp => createExpense(exp, false));
-    updateBalance();
+    expenses.forEach(e => renderExpense(e));
+    updateUI();
 };
 
+// Income
 function addIncome() {
-    let income = document.getElementById("income").value;
-    if (income === "") return alert("Enter income");
-
-    incomeTotal += Number(income);
+    let val = Number(document.getElementById("income").value);
+    incomeTotal += val;
     localStorage.setItem("income", incomeTotal);
-    document.getElementById("incomeTotal").innerText = incomeTotal;
-    document.getElementById("income").value = "";
-    updateBalance();
+    updateUI();
 }
 
+// Budget
+function setBudget() {
+    budget = Number(document.getElementById("budget").value);
+    localStorage.setItem("budget", budget);
+    updateUI();
+}
+
+// Add Expense
 function addExpense() {
-    let date = dateInput();
-    let title = titleInput();
-    let category = categoryInput();
-    let amount = amountInput();
+    let exp = {
+        date: document.getElementById("date").value,
+        title: document.getElementById("title").value,
+        category: document.getElementById("category").value,
+        amount: Number(document.getElementById("amount").value)
+    };
 
-    if (!date || !title || !amount) return alert("Fill all fields");
-
-    let expense = { date, title, category, amount };
-    createExpense(expense, true);
-    saveExpense(expense);
-
-    clearInputs();
+    expenses.push(exp);
+    localStorage.setItem("expenses", JSON.stringify(expenses));
+    renderExpense(exp);
+    updateUI();
 }
 
-function createExpense(exp, save) {
-    expenseTotal += exp.amount;
-    summary[exp.category] += exp.amount;
-
+// Render Expense
+function renderExpense(exp) {
     let li = document.createElement("li");
     li.innerHTML = `
-        ${exp.date} | ${exp.title} (${exp.category}) - ₹${exp.amount}
-        <button class="delete" onclick="deleteExpense(this,'${exp.category}',${exp.amount})">X</button>
+        ${exp.date} - ${exp.title} - ₹${exp.amount}
+        <span>
+            <button class="edit" onclick="editExpense('${exp.title}')">E</button>
+            <button class="delete" onclick="deleteExpense('${exp.title}')">X</button>
+        </span>
     `;
     document.getElementById("list").appendChild(li);
-    updateUI();
 }
 
-function deleteExpense(btn, category, amount) {
-    expenseTotal -= amount;
-    summary[category] -= amount;
-    btn.parentElement.remove();
-    updateUI();
+// Delete
+function deleteExpense(title) {
+    expenses = expenses.filter(e => e.title !== title);
+    localStorage.setItem("expenses", JSON.stringify(expenses));
+    reloadList();
 }
 
-function updateUI() {
-    document.getElementById("expenseTotal").innerText = expenseTotal;
-    document.getElementById("food").innerText = summary.Food;
-    document.getElementById("travel").innerText = summary.Travel;
-    document.getElementById("other").innerText = summary.Other;
-    updateBalance();
-    drawChart();
+// Edit
+function editExpense(title) {
+    let exp = expenses.find(e => e.title === title);
+    document.getElementById("title").value = exp.title;
+    document.getElementById("amount").value = exp.amount;
+    deleteExpense(title);
 }
 
-function updateBalance() {
-    document.getElementById("balance").innerText = incomeTotal - expenseTotal;
-}
-
-function saveExpense(exp) {
-    let data = JSON.parse(localStorage.getItem("expenses")) || [];
-    data.push(exp);
-    localStorage.setItem("expenses", JSON.stringify(data));
-}
-
-function filterExpenses() {
-    let date = document.getElementById("filterDate").value;
-    let category = document.getElementById("filterCategory").value;
-    let data = JSON.parse(localStorage.getItem("expenses")) || [];
-
+// Search
+function searchExpense() {
+    let key = document.getElementById("search").value.toLowerCase();
     document.getElementById("list").innerHTML = "";
-    expenseTotal = 0;
-    summary = { Food: 0, Travel: 0, Other: 0 };
-
-    data.forEach(exp => {
-        if ((date === "" || exp.date === date) &&
-            (category === "All" || exp.category === category)) {
-            createExpense(exp, false);
-        }
-    });
+    expenses.filter(e => e.title.toLowerCase().includes(key))
+            .forEach(e => renderExpense(e));
 }
 
-function monthlyReport() {
-    let month = document.getElementById("month").value;
-    let data = JSON.parse(localStorage.getItem("expenses")) || [];
-    let total = 0;
+// UI update
+function updateUI() {
+    expenseTotal = expenses.reduce((s, e) => s + e.amount, 0);
+    document.getElementById("expenseTotal").innerText = expenseTotal;
+    document.getElementById("balance").innerText = incomeTotal - expenseTotal;
 
-    data.forEach(exp => {
-        if (exp.date.startsWith(month)) total += exp.amount;
-    });
+    let today = new Date().toISOString().slice(0,10);
+    let todayTotal = expenses
+        .filter(e => e.date === today)
+        .reduce((s, e) => s + e.amount, 0);
 
-    document.getElementById("monthlyTotal").innerText =
-        "Total expense for selected month: ₹ " + total;
-}
+    document.getElementById("todayTotal").innerText = todayTotal;
 
-function drawChart() {
-    let c = document.getElementById("chart");
-    let ctx = c.getContext("2d");
-    ctx.clearRect(0, 0, c.width, c.height);
-
-    let values = [summary.Food, summary.Travel, summary.Other];
-    let labels = ["Food", "Travel", "Other"];
-
-    values.forEach((v, i) => {
-        ctx.fillStyle = "#007bff";
-        ctx.fillRect(40 + i * 80, 180 - v / 5, 40, v / 5);
-        ctx.fillStyle = "#000";
-        ctx.fillText(labels[i], 40 + i * 80, 195);
-    });
-}
-
-function clearAll() {
-    if (confirm("Clear all data?")) {
-        localStorage.clear();
-        location.reload();
+    let msg = document.getElementById("budgetMsg");
+    if (budget && expenseTotal > budget) {
+        msg.innerText = "⚠ Budget Exceeded";
+    } else {
+        msg.innerText = "Within Budget";
     }
 }
 
-/* Helper functions */
-function dateInput() { return document.getElementById("date").value; }
-function titleInput() { return document.getElementById("title").value; }
-function categoryInput() { return document.getElementById("category").value; }
-function amountInput() { return Number(document.getElementById("amount").value); }
-function clearInputs() {
-    document.getElementById("date").value = "";
-    document.getElementById("title").value = "";
-    document.getElementById("amount").value = "";
+// Reload
+function reloadList() {
+    document.getElementById("list").innerHTML = "";
+    expenses.forEach(e => renderExpense(e));
+    updateUI();
+}
+
+// Clear
+function clearAll() {
+    localStorage.clear();
+    location.reload();
+}
+
+// Dark Mode
+function toggleMode() {
+    document.body.classList.toggle("dark");
 }
